@@ -40,10 +40,8 @@ function Landing() {
   return (
     <div className="min-h-screen bg-[oklch(0.97_0.005_240)] text-foreground">
       <header className="border-b border-border/60 bg-[var(--brand-navy)] text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-3">
-            <ProtegeLogo className="h-14 w-auto rounded-lg bg-white p-1.5" />
-          </div>
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+          <ProtegeLogo className="h-16 w-auto" />
         </div>
       </header>
 
