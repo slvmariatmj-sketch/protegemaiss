@@ -40,17 +40,8 @@ function Landing() {
   return (
     <div className="min-h-screen bg-[oklch(0.97_0.005_240)] text-foreground">
       <header className="border-b border-border/60 bg-[var(--brand-navy)] text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-3">
-            <ProtegeLogo className="h-11 w-11 rounded-md bg-white/5 p-1" />
-            <div className="leading-tight">
-              <p className="text-lg font-bold tracking-tight">PROTEGE MAIS</p>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-white/70">Gestão Escolar</p>
-            </div>
-          </div>
-          <Link to="/denuncia" className="text-sm font-medium text-white/90 hover:text-white underline-offset-4 hover:underline">
-            Fazer denúncia anônima
-          </Link>
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+          <ProtegeLogo className="h-16 w-auto" />
         </div>
       </header>
 
