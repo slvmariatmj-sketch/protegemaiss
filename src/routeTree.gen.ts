@@ -9,38 +9,147 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PainelRouteImport } from './routes/painel'
+import { Route as DenunciaRouteImport } from './routes/denuncia'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalResponsavelRouteImport } from './routes/portal.responsavel'
+import { Route as PortalAlunoRouteImport } from './routes/portal.aluno'
+import { Route as AuthResponsavelRouteImport } from './routes/auth.responsavel'
+import { Route as AuthEquipeRouteImport } from './routes/auth.equipe'
+import { Route as AuthAlunoRouteImport } from './routes/auth.aluno'
 
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DenunciaRoute = DenunciaRouteImport.update({
+  id: '/denuncia',
+  path: '/denuncia',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalResponsavelRoute = PortalResponsavelRouteImport.update({
+  id: '/portal/responsavel',
+  path: '/portal/responsavel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalAlunoRoute = PortalAlunoRouteImport.update({
+  id: '/portal/aluno',
+  path: '/portal/aluno',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResponsavelRoute = AuthResponsavelRouteImport.update({
+  id: '/auth/responsavel',
+  path: '/auth/responsavel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthEquipeRoute = AuthEquipeRouteImport.update({
+  id: '/auth/equipe',
+  path: '/auth/equipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthAlunoRoute = AuthAlunoRouteImport.update({
+  id: '/auth/aluno',
+  path: '/auth/aluno',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/denuncia': typeof DenunciaRoute
+  '/painel': typeof PainelRoute
+  '/auth/aluno': typeof AuthAlunoRoute
+  '/auth/equipe': typeof AuthEquipeRoute
+  '/auth/responsavel': typeof AuthResponsavelRoute
+  '/portal/aluno': typeof PortalAlunoRoute
+  '/portal/responsavel': typeof PortalResponsavelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/denuncia': typeof DenunciaRoute
+  '/painel': typeof PainelRoute
+  '/auth/aluno': typeof AuthAlunoRoute
+  '/auth/equipe': typeof AuthEquipeRoute
+  '/auth/responsavel': typeof AuthResponsavelRoute
+  '/portal/aluno': typeof PortalAlunoRoute
+  '/portal/responsavel': typeof PortalResponsavelRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/denuncia': typeof DenunciaRoute
+  '/painel': typeof PainelRoute
+  '/auth/aluno': typeof AuthAlunoRoute
+  '/auth/equipe': typeof AuthEquipeRoute
+  '/auth/responsavel': typeof AuthResponsavelRoute
+  '/portal/aluno': typeof PortalAlunoRoute
+  '/portal/responsavel': typeof PortalResponsavelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/denuncia'
+    | '/painel'
+    | '/auth/aluno'
+    | '/auth/equipe'
+    | '/auth/responsavel'
+    | '/portal/aluno'
+    | '/portal/responsavel'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/denuncia'
+    | '/painel'
+    | '/auth/aluno'
+    | '/auth/equipe'
+    | '/auth/responsavel'
+    | '/portal/aluno'
+    | '/portal/responsavel'
+  id:
+    | '__root__'
+    | '/'
+    | '/denuncia'
+    | '/painel'
+    | '/auth/aluno'
+    | '/auth/equipe'
+    | '/auth/responsavel'
+    | '/portal/aluno'
+    | '/portal/responsavel'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DenunciaRoute: typeof DenunciaRoute
+  PainelRoute: typeof PainelRoute
+  AuthAlunoRoute: typeof AuthAlunoRoute
+  AuthEquipeRoute: typeof AuthEquipeRoute
+  AuthResponsavelRoute: typeof AuthResponsavelRoute
+  PortalAlunoRoute: typeof PortalAlunoRoute
+  PortalResponsavelRoute: typeof PortalResponsavelRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/denuncia': {
+      id: '/denuncia'
+      path: '/denuncia'
+      fullPath: '/denuncia'
+      preLoaderRoute: typeof DenunciaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +157,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/responsavel': {
+      id: '/portal/responsavel'
+      path: '/portal/responsavel'
+      fullPath: '/portal/responsavel'
+      preLoaderRoute: typeof PortalResponsavelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/aluno': {
+      id: '/portal/aluno'
+      path: '/portal/aluno'
+      fullPath: '/portal/aluno'
+      preLoaderRoute: typeof PortalAlunoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/responsavel': {
+      id: '/auth/responsavel'
+      path: '/auth/responsavel'
+      fullPath: '/auth/responsavel'
+      preLoaderRoute: typeof AuthResponsavelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/equipe': {
+      id: '/auth/equipe'
+      path: '/auth/equipe'
+      fullPath: '/auth/equipe'
+      preLoaderRoute: typeof AuthEquipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/aluno': {
+      id: '/auth/aluno'
+      path: '/auth/aluno'
+      fullPath: '/auth/aluno'
+      preLoaderRoute: typeof AuthAlunoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DenunciaRoute: DenunciaRoute,
+  PainelRoute: PainelRoute,
+  AuthAlunoRoute: AuthAlunoRoute,
+  AuthEquipeRoute: AuthEquipeRoute,
+  AuthResponsavelRoute: AuthResponsavelRoute,
+  PortalAlunoRoute: PortalAlunoRoute,
+  PortalResponsavelRoute: PortalResponsavelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
