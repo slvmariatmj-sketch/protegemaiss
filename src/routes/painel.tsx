@@ -66,23 +66,37 @@ function StaffPanel() {
       </header>
       <main className="mx-auto max-w-7xl px-5 py-8">
         <Tabs defaultValue="alunos" className="w-full">
-          <TabsList className="flex w-full flex-wrap justify-start bg-card">
-            <TabsTrigger value="alunos"><Users className="mr-2 h-4 w-4" />Alunos</TabsTrigger>
-            <TabsTrigger value="ocorrencias"><BookOpenCheck className="mr-2 h-4 w-4" />Ocorrências</TabsTrigger>
-            <TabsTrigger value="faltas"><ClipboardList className="mr-2 h-4 w-4" />Faltas</TabsTrigger>
-            <TabsTrigger value="comunicados"><Megaphone className="mr-2 h-4 w-4" />Comunicados</TabsTrigger>
-            <TabsTrigger value="eventos"><CalendarDays className="mr-2 h-4 w-4" />Eventos</TabsTrigger>
-            <TabsTrigger value="denuncias"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-6">
+            <TabsTrigger value="alunos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Users className="mr-2 h-4 w-4" />Alunos</TabsTrigger>
+            <TabsTrigger value="ocorrencias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><BookOpenCheck className="mr-2 h-4 w-4" />Ocorrências</TabsTrigger>
+            <TabsTrigger value="faltas" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ClipboardList className="mr-2 h-4 w-4" />Faltas</TabsTrigger>
+            <TabsTrigger value="comunicados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Megaphone className="mr-2 h-4 w-4" />Comunicados</TabsTrigger>
+            <TabsTrigger value="eventos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><CalendarDays className="mr-2 h-4 w-4" />Eventos</TabsTrigger>
+            <TabsTrigger value="denuncias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="alunos" className="mt-6"><StudentsTab /></TabsContent>
-          <TabsContent value="ocorrencias" className="mt-6"><OccurrencesTab /></TabsContent>
-          <TabsContent value="faltas" className="mt-6"><AttendanceTab /></TabsContent>
-          <TabsContent value="comunicados" className="mt-6"><CommunicationsTab /></TabsContent>
-          <TabsContent value="eventos" className="mt-6"><EventsTab /></TabsContent>
-          <TabsContent value="denuncias" className="mt-6"><ReportsTab /></TabsContent>
+          <TabsContent value="alunos" className="mt-8"><SectionHeader icon={Users} title="Alunos" subtitle="Cadastro e listagem por série e turno." /><StudentsTab /></TabsContent>
+          <TabsContent value="ocorrencias" className="mt-8"><SectionHeader icon={BookOpenCheck} title="Ocorrências & Indisciplinas" subtitle="Registre acontecimentos relevantes da rotina escolar." /><OccurrencesTab /></TabsContent>
+          <TabsContent value="faltas" className="mt-8"><SectionHeader icon={ClipboardList} title="Faltas & Presenças" subtitle="Controle diário de frequência dos alunos." /><AttendanceTab /></TabsContent>
+          <TabsContent value="comunicados" className="mt-8"><SectionHeader icon={Megaphone} title="Comunicados" subtitle="Publique avisos para equipe, responsáveis e alunos." /><CommunicationsTab /></TabsContent>
+          <TabsContent value="eventos" className="mt-8"><SectionHeader icon={CalendarDays} title="Eventos da escola" subtitle="Agenda de atividades, reuniões e datas importantes." /><EventsTab /></TabsContent>
+          <TabsContent value="denuncias" className="mt-8"><SectionHeader icon={ShieldAlert} title="Denúncias anônimas" subtitle="Acompanhe e atualize relatos recebidos." /><ReportsTab /></TabsContent>
         </Tabs>
       </main>
+    </div>
+  );
+}
+
+function SectionHeader({ icon: Icon, title, subtitle }: { icon: any; title: string; subtitle: string }) {
+  return (
+    <div className="mb-6 flex items-center gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div className="grid h-12 w-12 place-items-center rounded-xl bg-[var(--brand-navy)] text-white shadow-md">
+        <Icon className="h-6 w-6" />
+      </div>
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight text-[var(--brand-navy)]">{title}</h2>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+      </div>
     </div>
   );
 }
