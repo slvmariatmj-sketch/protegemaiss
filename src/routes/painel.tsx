@@ -66,23 +66,37 @@ function StaffPanel() {
       </header>
       <main className="mx-auto max-w-7xl px-5 py-8">
         <Tabs defaultValue="alunos" className="w-full">
-          <TabsList className="flex w-full flex-wrap justify-start bg-card">
-            <TabsTrigger value="alunos"><Users className="mr-2 h-4 w-4" />Alunos</TabsTrigger>
-            <TabsTrigger value="ocorrencias"><BookOpenCheck className="mr-2 h-4 w-4" />Ocorrências</TabsTrigger>
-            <TabsTrigger value="faltas"><ClipboardList className="mr-2 h-4 w-4" />Faltas</TabsTrigger>
-            <TabsTrigger value="comunicados"><Megaphone className="mr-2 h-4 w-4" />Comunicados</TabsTrigger>
-            <TabsTrigger value="eventos"><CalendarDays className="mr-2 h-4 w-4" />Eventos</TabsTrigger>
-            <TabsTrigger value="denuncias"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-6">
+            <TabsTrigger value="alunos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Users className="mr-2 h-4 w-4" />Alunos</TabsTrigger>
+            <TabsTrigger value="ocorrencias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><BookOpenCheck className="mr-2 h-4 w-4" />Ocorrências</TabsTrigger>
+            <TabsTrigger value="faltas" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ClipboardList className="mr-2 h-4 w-4" />Faltas</TabsTrigger>
+            <TabsTrigger value="comunicados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Megaphone className="mr-2 h-4 w-4" />Comunicados</TabsTrigger>
+            <TabsTrigger value="eventos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><CalendarDays className="mr-2 h-4 w-4" />Eventos</TabsTrigger>
+            <TabsTrigger value="denuncias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="alunos" className="mt-6"><StudentsTab /></TabsContent>
-          <TabsContent value="ocorrencias" className="mt-6"><OccurrencesTab /></TabsContent>
-          <TabsContent value="faltas" className="mt-6"><AttendanceTab /></TabsContent>
-          <TabsContent value="comunicados" className="mt-6"><CommunicationsTab /></TabsContent>
-          <TabsContent value="eventos" className="mt-6"><EventsTab /></TabsContent>
-          <TabsContent value="denuncias" className="mt-6"><ReportsTab /></TabsContent>
+          <TabsContent value="alunos" className="mt-8"><SectionHeader icon={Users} title="Alunos" subtitle="Cadastro e listagem por série e turno." /><StudentsTab /></TabsContent>
+          <TabsContent value="ocorrencias" className="mt-8"><SectionHeader icon={BookOpenCheck} title="Ocorrências & Indisciplinas" subtitle="Registre acontecimentos relevantes da rotina escolar." /><OccurrencesTab /></TabsContent>
+          <TabsContent value="faltas" className="mt-8"><SectionHeader icon={ClipboardList} title="Faltas & Presenças" subtitle="Controle diário de frequência dos alunos." /><AttendanceTab /></TabsContent>
+          <TabsContent value="comunicados" className="mt-8"><SectionHeader icon={Megaphone} title="Comunicados" subtitle="Publique avisos para equipe, responsáveis e alunos." /><CommunicationsTab /></TabsContent>
+          <TabsContent value="eventos" className="mt-8"><SectionHeader icon={CalendarDays} title="Eventos da escola" subtitle="Agenda de atividades, reuniões e datas importantes." /><EventsTab /></TabsContent>
+          <TabsContent value="denuncias" className="mt-8"><SectionHeader icon={ShieldAlert} title="Denúncias anônimas" subtitle="Acompanhe e atualize relatos recebidos." /><ReportsTab /></TabsContent>
         </Tabs>
       </main>
+    </div>
+  );
+}
+
+function SectionHeader({ icon: Icon, title, subtitle }: { icon: any; title: string; subtitle: string }) {
+  return (
+    <div className="mb-6 flex items-center gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div className="grid h-12 w-12 place-items-center rounded-xl bg-[var(--brand-navy)] text-white shadow-md">
+        <Icon className="h-6 w-6" />
+      </div>
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight text-[var(--brand-navy)]">{title}</h2>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+      </div>
     </div>
   );
 }
@@ -157,38 +171,39 @@ function StudentsTab() {
 }
 
 function StudentDialog({ onSaved }: { onSaved: () => void }) {
-  const [f, setF] = useState({ full_name: "", registration_number: "", cpf: "", grade: "", shift: "manhã", guardian_name: "", guardian_cpf: "", performance_grade: "0", performance_notes: "" });
+  const [f, setF] = useState({ full_name: "", grade: "", shift: "manhã" });
   const set = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
 
   async function save() {
+    if (!f.full_name.trim() || !f.grade.trim()) return toast.error("Preencha nome e turma.");
+    const year = new Date().getFullYear();
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    const registration_number = `${year}-${Date.now().toString().slice(-5)}${rand}`;
+    const cpf = String(Math.floor(10000000000 + Math.random() * 89999999999)).slice(0, 11);
     const { error } = await supabase.from("students").insert({
-      full_name: f.full_name, registration_number: f.registration_number, cpf: f.cpf,
-      grade: f.grade, shift: f.shift, guardian_name: f.guardian_name || null,
-      guardian_cpf: f.guardian_cpf || null, performance_grade: Number(f.performance_grade) || 0,
-      performance_notes: f.performance_notes || null,
+      full_name: f.full_name.trim(),
+      registration_number,
+      cpf,
+      grade: f.grade.trim(),
+      shift: f.shift,
+      performance_grade: 0,
     });
     if (error) toast.error(error.message); else { toast.success("Aluno cadastrado."); onSaved(); }
   }
 
   return (
-    <DialogContent className="max-w-lg">
+    <DialogContent className="max-w-md">
       <DialogHeader><DialogTitle>Novo aluno</DialogTitle></DialogHeader>
-      <div className="grid gap-3 md:grid-cols-2">
-        <Field label="Nome completo" className="md:col-span-2"><Input value={f.full_name} onChange={(e) => set("full_name", e.target.value)} /></Field>
-        <Field label="Matrícula"><Input value={f.registration_number} onChange={(e) => set("registration_number", e.target.value)} /></Field>
-        <Field label="CPF do aluno"><Input value={f.cpf} onChange={(e) => set("cpf", e.target.value)} /></Field>
-        <Field label="Série"><Input value={f.grade} onChange={(e) => set("grade", e.target.value)} placeholder="Ex.: 9º ano A" /></Field>
+      <div className="space-y-3">
+        <Field label="Nome"><Input value={f.full_name} onChange={(e) => set("full_name", e.target.value)} placeholder="Nome do aluno" /></Field>
+        <Field label="Turma"><Input value={f.grade} onChange={(e) => set("grade", e.target.value)} placeholder="Ex.: 9º ano A" /></Field>
         <Field label="Turno">
           <select value={f.shift} onChange={(e) => set("shift", e.target.value)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
             <option value="manhã">Manhã</option><option value="tarde">Tarde</option><option value="noite">Noite</option><option value="integral">Integral</option>
           </select>
         </Field>
-        <Field label="Nome do responsável"><Input value={f.guardian_name} onChange={(e) => set("guardian_name", e.target.value)} /></Field>
-        <Field label="CPF do responsável"><Input value={f.guardian_cpf} onChange={(e) => set("guardian_cpf", e.target.value)} /></Field>
-        <Field label="Nota geral"><Input type="number" step="0.1" value={f.performance_grade} onChange={(e) => set("performance_grade", e.target.value)} /></Field>
-        <Field label="Observações de desempenho" className="md:col-span-2"><Textarea rows={2} value={f.performance_notes} onChange={(e) => set("performance_notes", e.target.value)} /></Field>
       </div>
-      <DialogFooter><Button onClick={save} className="bg-[var(--brand-navy)]">Salvar</Button></DialogFooter>
+      <DialogFooter><Button onClick={save} className="bg-[var(--brand-navy)] hover:bg-[var(--brand-navy-deep)]">Salvar</Button></DialogFooter>
     </DialogContent>
   );
 }
