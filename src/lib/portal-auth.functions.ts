@@ -5,7 +5,7 @@ const onlyDigits = (s: string) => s.replace(/\D/g, "");
 
 const loginSchema = z.object({
   registration_number: z.string().trim().min(1).max(50),
-  cpf: z.string().trim().min(11).max(20),
+  cpf: z.string().trim().max(20).optional().default(""),
   kind: z.enum(["parent", "student"]),
 });
 
@@ -30,10 +30,12 @@ export const portalLogin = createServerFn({ method: "POST" })
     const studentCpf = onlyDigits(student.cpf ?? "");
     const guardianCpf = onlyDigits(student.guardian_cpf ?? "");
 
-    if (data.kind === "student" && studentCpf !== cpf) {
+    // CPF é opcional: só validamos quando o aluno tem CPF cadastrado E o
+    // usuário informou um. Cadastros simplificados (sem CPF) usam apenas matrícula.
+    if (data.kind === "student" && studentCpf && cpf && studentCpf !== cpf) {
       throw new Error("Matrícula ou CPF inválidos.");
     }
-    if (data.kind === "parent" && guardianCpf !== cpf) {
+    if (data.kind === "parent" && guardianCpf && cpf && guardianCpf !== cpf) {
       throw new Error("Matrícula ou CPF do responsável inválidos.");
     }
 

@@ -44,8 +44,8 @@ function ParentAuth() {
           <Input id="reg" value={reg} onChange={(e) => setReg(e.target.value)} required maxLength={50} placeholder="Ex.: 2026-0042" />
         </div>
         <div>
-          <Label htmlFor="cpf">Seu CPF</Label>
-          <Input id="cpf" value={cpf} onChange={(e) => setCpf(e.target.value)} required maxLength={20} placeholder="000.000.000-00" />
+          <Label htmlFor="cpf">Seu CPF <span className="text-xs text-muted-foreground">(opcional)</span></Label>
+          <Input id="cpf" value={cpf} onChange={(e) => setCpf(e.target.value)} maxLength={20} placeholder="000.000.000-00" />
         </div>
         <Button type="submit" disabled={loading} className="w-full bg-[var(--brand-navy)] hover:bg-[var(--brand-navy-deep)]">
           {loading ? "Validando..." : "Entrar"}
