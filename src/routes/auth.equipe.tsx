@@ -32,17 +32,43 @@ function StaffAuth() {
           options: { emailRedirectTo: window.location.origin + "/painel" },
         });
         if (error) throw error;
-        if (data.user) {
+        // Garante sessão para que o RLS permita o insert (user_id = auth.uid())
+        let userId = data.session?.user.id ?? null;
+        if (!data.session) {
+          const { data: signIn, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+          if (signInErr) {
+            toast.success("Cadastro criado. Confirme seu e-mail e faça login para concluir.");
+            setMode("login");
+            return;
+          }
+          userId = signIn.user?.id ?? null;
+        }
+        if (userId) {
           const { error: roleErr } = await supabase
             .from("user_roles")
-            .insert({ user_id: data.user.id, role, full_name: name });
-          if (roleErr) console.warn(roleErr);
+            .upsert({ user_id: userId, role, full_name: name }, { onConflict: "user_id,role" });
+          if (roleErr) throw roleErr;
         }
-        toast.success("Cadastro criado. Verifique seu e-mail e faça login.");
-        setMode("login");
+        toast.success("Conta criada e equipe vinculada.");
+        navigate({ to: "/painel" });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        // Se a conta antiga ficou sem papel (cadastro anterior bugado), grava agora
+        if (signIn.user) {
+          const { data: existing } = await supabase
+            .from("user_roles")
+            .select("id")
+            .eq("user_id", signIn.user.id)
+            .maybeSingle();
+          if (!existing) {
+            await supabase.from("user_roles").insert({
+              user_id: signIn.user.id,
+              role: "teacher",
+              full_name: signIn.user.email ?? "Equipe",
+            });
+          }
+        }
         toast.success("Bem-vindo(a)!");
         navigate({ to: "/painel" });
       }
