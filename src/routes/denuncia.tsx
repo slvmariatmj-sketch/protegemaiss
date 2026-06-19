@@ -22,6 +22,7 @@ function ReportPage() {
   const submit = useServerFn(submitAnonymousReport);
   const upload = useServerFn(uploadReportImage);
   const [category, setCategory] = useState(categories[0]);
+  const [reporterName, setReporterName] = useState("");
   const [message, setMessage] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,7 +47,7 @@ function ReportPage() {
         const res = await upload({ data: { filename: file.name, contentBase64, contentType: file.type } });
         imagePath = res.path;
       }
-      await submit({ data: { category, message, image_path: imagePath } });
+      await submit({ data: { category, reporter_name: reporterName.trim(), message, image_path: imagePath } });
       setDone(true);
       toast.success("Denúncia enviada com segurança.");
     } catch (err: any) {
@@ -93,6 +94,10 @@ function ReportPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="name">Seu nome</Label>
+                <Input id="name" required value={reporterName} onChange={(e) => setReporterName(e.target.value)} placeholder="Nome completo" />
+              </div>
               <div>
                 <Label htmlFor="cat">Categoria</Label>
                 <select

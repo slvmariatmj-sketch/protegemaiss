@@ -515,6 +515,9 @@ function ReportsTab() {
                 </select>
               </div>
             </div>
+            {r.reporter_name && (
+              <p className="mt-1 text-xs font-medium text-[var(--brand-navy)]">Por: {r.reporter_name}</p>
+            )}
             <p className="mt-2 text-sm">{r.message}</p>
           </li>
         ))}
