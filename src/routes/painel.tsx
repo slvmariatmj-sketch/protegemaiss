@@ -480,6 +480,7 @@ function EventDialog({ onSaved }: { onSaved: () => void }) {
 /* ---------------- Anonymous reports ---------------- */
 function ReportsTab() {
   const [list, setList] = useState<any[]>([]);
+  const removeFn = useServerFn(deleteAnonymousReport);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.from("anonymous_reports").select("*").order("created_at", { ascending: false }).limit(100);
@@ -490,6 +491,17 @@ function ReportsTab() {
   async function setStatus(id: string, status: string) {
     const { error } = await supabase.from("anonymous_reports").update({ status }).eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Atualizado."); load(); }
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Excluir esta denúncia? Essa ação não pode ser desfeita.")) return;
+    try {
+      await removeFn({ data: { id } });
+      toast.success("Denúncia excluída.");
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao excluir.");
+    }
   }
 
   async function openImage(path: string) {
@@ -517,6 +529,9 @@ function ReportsTab() {
                   <option value="em_analise">Em análise</option>
                   <option value="resolvido">Resolvido</option>
                 </select>
+                <Button size="sm" variant="destructive" onClick={() => remove(r.id)} title="Excluir denúncia">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
             {r.reporter_name && (
@@ -538,3 +553,77 @@ function groupBy<T>(arr: T[], key: (t: T) => string): Record<string, T[]> {
   return arr.reduce((acc, item) => { const k = key(item); (acc[k] ||= []).push(item); return acc; }, {} as Record<string, T[]>);
 }
 function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/* ---------------- Registrations ---------------- */
+function RegistrationsTab() {
+  const [data, setData] = useState<{ staff: any[]; students: any[] } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const fetchList = useServerFn(listRegistrations);
+
+  useEffect(() => {
+    fetchList()
+      .then((res: any) => setData(res))
+      .catch((e: any) => toast.error(e?.message ?? "Falha ao carregar."))
+      .finally(() => setLoading(false));
+  }, [fetchList]);
+
+  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (!data) return null;
+
+  const roleLabel: Record<string, string> = {
+    teacher: "Professor(a)",
+    coordinator: "Coordenador(a)",
+    director: "Diretor(a)",
+    pedagogue: "Pedagogo(a)",
+  };
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      <Card className="p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-[var(--brand-navy)]">Equipe cadastrada</h3>
+          <Badge variant="secondary">{data.staff.length}</Badge>
+        </div>
+        <ul className="divide-y">
+          {data.staff.length === 0 && <li className="py-3 text-sm text-muted-foreground">Nenhum cadastro.</li>}
+          {data.staff.map((s) => (
+            <li key={s.id} className="py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="font-medium">{s.full_name ?? s.email ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground">{s.email ?? ""}</p>
+                </div>
+                <Badge>{roleLabel[s.role] ?? s.role}</Badge>
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">Desde {new Date(s.created_at).toLocaleDateString("pt-BR")}</p>
+            </li>
+          ))}
+        </ul>
+      </Card>
+
+      <Card className="p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-[var(--brand-navy)]">Alunos cadastrados</h3>
+          <Badge variant="secondary">{data.students.length}</Badge>
+        </div>
+        <ul className="divide-y">
+          {data.students.length === 0 && <li className="py-3 text-sm text-muted-foreground">Nenhum cadastro.</li>}
+          {data.students.map((s) => (
+            <li key={s.id} className="py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="font-medium">{s.full_name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {s.grade} · {cap(s.shift)} · Mat. {s.registration_number}
+                  </p>
+                  {s.guardian_name && <p className="text-xs">Resp.: {s.guardian_name}</p>}
+                </div>
+                <p className="text-[11px] text-muted-foreground">{new Date(s.created_at).toLocaleDateString("pt-BR")}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </div>
+  );
+}
