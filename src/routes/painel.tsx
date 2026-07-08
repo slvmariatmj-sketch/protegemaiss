@@ -11,7 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { LogOut, Plus, Users, Megaphone, CalendarDays, ShieldAlert, BookOpenCheck, ClipboardList } from "lucide-react";
+import { LogOut, Plus, Users, Megaphone, CalendarDays, ShieldAlert, BookOpenCheck, ClipboardList, Trash2, UserCheck } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteAnonymousReport, listRegistrations } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/painel")({
   ssr: false,
@@ -66,13 +68,14 @@ function StaffPanel() {
       </header>
       <main className="mx-auto max-w-7xl px-5 py-8">
         <Tabs defaultValue="alunos" className="w-full">
-          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-6">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-7">
             <TabsTrigger value="alunos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Users className="mr-2 h-4 w-4" />Alunos</TabsTrigger>
             <TabsTrigger value="ocorrencias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><BookOpenCheck className="mr-2 h-4 w-4" />Ocorrências</TabsTrigger>
             <TabsTrigger value="faltas" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ClipboardList className="mr-2 h-4 w-4" />Faltas</TabsTrigger>
             <TabsTrigger value="comunicados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Megaphone className="mr-2 h-4 w-4" />Comunicados</TabsTrigger>
             <TabsTrigger value="eventos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><CalendarDays className="mr-2 h-4 w-4" />Eventos</TabsTrigger>
             <TabsTrigger value="denuncias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>
+            <TabsTrigger value="cadastrados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><UserCheck className="mr-2 h-4 w-4" />Cadastrados</TabsTrigger>
           </TabsList>
 
           <TabsContent value="alunos" className="mt-8"><SectionHeader icon={Users} title="Alunos" subtitle="Cadastro e listagem por série e turno." /><StudentsTab /></TabsContent>
@@ -81,6 +84,7 @@ function StaffPanel() {
           <TabsContent value="comunicados" className="mt-8"><SectionHeader icon={Megaphone} title="Comunicados" subtitle="Publique avisos para equipe, responsáveis e alunos." /><CommunicationsTab /></TabsContent>
           <TabsContent value="eventos" className="mt-8"><SectionHeader icon={CalendarDays} title="Eventos da escola" subtitle="Agenda de atividades, reuniões e datas importantes." /><EventsTab /></TabsContent>
           <TabsContent value="denuncias" className="mt-8"><SectionHeader icon={ShieldAlert} title="Denúncias anônimas" subtitle="Acompanhe e atualize relatos recebidos." /><ReportsTab /></TabsContent>
+          <TabsContent value="cadastrados" className="mt-8"><SectionHeader icon={UserCheck} title="Cadastrados na plataforma" subtitle="Toda a equipe e alunos que já se cadastraram." /><RegistrationsTab /></TabsContent>
         </Tabs>
       </main>
     </div>
@@ -476,6 +480,7 @@ function EventDialog({ onSaved }: { onSaved: () => void }) {
 /* ---------------- Anonymous reports ---------------- */
 function ReportsTab() {
   const [list, setList] = useState<any[]>([]);
+  const removeFn = useServerFn(deleteAnonymousReport);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.from("anonymous_reports").select("*").order("created_at", { ascending: false }).limit(100);
@@ -486,6 +491,17 @@ function ReportsTab() {
   async function setStatus(id: string, status: string) {
     const { error } = await supabase.from("anonymous_reports").update({ status }).eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Atualizado."); load(); }
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Excluir esta denúncia? Essa ação não pode ser desfeita.")) return;
+    try {
+      await removeFn({ data: { id } });
+      toast.success("Denúncia excluída.");
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao excluir.");
+    }
   }
 
   async function openImage(path: string) {
@@ -513,6 +529,9 @@ function ReportsTab() {
                   <option value="em_analise">Em análise</option>
                   <option value="resolvido">Resolvido</option>
                 </select>
+                <Button size="sm" variant="destructive" onClick={() => remove(r.id)} title="Excluir denúncia">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
             {r.reporter_name && (
@@ -534,3 +553,77 @@ function groupBy<T>(arr: T[], key: (t: T) => string): Record<string, T[]> {
   return arr.reduce((acc, item) => { const k = key(item); (acc[k] ||= []).push(item); return acc; }, {} as Record<string, T[]>);
 }
 function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/* ---------------- Registrations ---------------- */
+function RegistrationsTab() {
+  const [data, setData] = useState<{ staff: any[]; students: any[] } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const fetchList = useServerFn(listRegistrations);
+
+  useEffect(() => {
+    fetchList()
+      .then((res: any) => setData(res))
+      .catch((e: any) => toast.error(e?.message ?? "Falha ao carregar."))
+      .finally(() => setLoading(false));
+  }, [fetchList]);
+
+  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (!data) return null;
+
+  const roleLabel: Record<string, string> = {
+    teacher: "Professor(a)",
+    coordinator: "Coordenador(a)",
+    director: "Diretor(a)",
+    pedagogue: "Pedagogo(a)",
+  };
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      <Card className="p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-[var(--brand-navy)]">Equipe cadastrada</h3>
+          <Badge variant="secondary">{data.staff.length}</Badge>
+        </div>
+        <ul className="divide-y">
+          {data.staff.length === 0 && <li className="py-3 text-sm text-muted-foreground">Nenhum cadastro.</li>}
+          {data.staff.map((s) => (
+            <li key={s.id} className="py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="font-medium">{s.full_name ?? s.email ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground">{s.email ?? ""}</p>
+                </div>
+                <Badge>{roleLabel[s.role] ?? s.role}</Badge>
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">Desde {new Date(s.created_at).toLocaleDateString("pt-BR")}</p>
+            </li>
+          ))}
+        </ul>
+      </Card>
+
+      <Card className="p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-[var(--brand-navy)]">Alunos cadastrados</h3>
+          <Badge variant="secondary">{data.students.length}</Badge>
+        </div>
+        <ul className="divide-y">
+          {data.students.length === 0 && <li className="py-3 text-sm text-muted-foreground">Nenhum cadastro.</li>}
+          {data.students.map((s) => (
+            <li key={s.id} className="py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="font-medium">{s.full_name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {s.grade} · {cap(s.shift)} · Mat. {s.registration_number}
+                  </p>
+                  {s.guardian_name && <p className="text-xs">Resp.: {s.guardian_name}</p>}
+                </div>
+                <p className="text-[11px] text-muted-foreground">{new Date(s.created_at).toLocaleDateString("pt-BR")}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </div>
+  );
+}
