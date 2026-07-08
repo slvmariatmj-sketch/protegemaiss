@@ -11,7 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { LogOut, Plus, Users, Megaphone, CalendarDays, ShieldAlert, BookOpenCheck, ClipboardList } from "lucide-react";
+import { LogOut, Plus, Users, Megaphone, CalendarDays, ShieldAlert, BookOpenCheck, ClipboardList, Trash2, UserCheck } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteAnonymousReport, listRegistrations } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/painel")({
   ssr: false,
@@ -66,13 +68,14 @@ function StaffPanel() {
       </header>
       <main className="mx-auto max-w-7xl px-5 py-8">
         <Tabs defaultValue="alunos" className="w-full">
-          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-6">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-7">
             <TabsTrigger value="alunos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Users className="mr-2 h-4 w-4" />Alunos</TabsTrigger>
             <TabsTrigger value="ocorrencias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><BookOpenCheck className="mr-2 h-4 w-4" />Ocorrências</TabsTrigger>
             <TabsTrigger value="faltas" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ClipboardList className="mr-2 h-4 w-4" />Faltas</TabsTrigger>
             <TabsTrigger value="comunicados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Megaphone className="mr-2 h-4 w-4" />Comunicados</TabsTrigger>
             <TabsTrigger value="eventos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><CalendarDays className="mr-2 h-4 w-4" />Eventos</TabsTrigger>
             <TabsTrigger value="denuncias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>
+            <TabsTrigger value="cadastrados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><UserCheck className="mr-2 h-4 w-4" />Cadastrados</TabsTrigger>
           </TabsList>
 
           <TabsContent value="alunos" className="mt-8"><SectionHeader icon={Users} title="Alunos" subtitle="Cadastro e listagem por série e turno." /><StudentsTab /></TabsContent>
@@ -81,6 +84,7 @@ function StaffPanel() {
           <TabsContent value="comunicados" className="mt-8"><SectionHeader icon={Megaphone} title="Comunicados" subtitle="Publique avisos para equipe, responsáveis e alunos." /><CommunicationsTab /></TabsContent>
           <TabsContent value="eventos" className="mt-8"><SectionHeader icon={CalendarDays} title="Eventos da escola" subtitle="Agenda de atividades, reuniões e datas importantes." /><EventsTab /></TabsContent>
           <TabsContent value="denuncias" className="mt-8"><SectionHeader icon={ShieldAlert} title="Denúncias anônimas" subtitle="Acompanhe e atualize relatos recebidos." /><ReportsTab /></TabsContent>
+          <TabsContent value="cadastrados" className="mt-8"><SectionHeader icon={UserCheck} title="Cadastrados na plataforma" subtitle="Toda a equipe e alunos que já se cadastraram." /><RegistrationsTab /></TabsContent>
         </Tabs>
       </main>
     </div>
