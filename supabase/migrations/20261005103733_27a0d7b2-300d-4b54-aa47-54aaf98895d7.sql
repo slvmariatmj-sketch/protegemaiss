@@ -1,0 +1,1 @@
+ALTER TABLE public.anonymous_reports ADD COLUMN IF NOT EXISTS reporter_cpf text;

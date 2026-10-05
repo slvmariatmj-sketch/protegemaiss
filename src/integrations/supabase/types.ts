@@ -21,6 +21,7 @@ export type Database = {
           id: string
           image_url: string | null
           message: string
+          reporter_cpf: string | null
           reporter_name: string | null
           status: string
         }
@@ -30,6 +31,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           message: string
+          reporter_cpf?: string | null
           reporter_name?: string | null
           status?: string
         }
@@ -39,6 +41,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           message?: string
+          reporter_cpf?: string | null
           reporter_name?: string | null
           status?: string
         }
