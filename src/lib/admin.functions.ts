@@ -56,3 +56,17 @@ export const listRegistrations = createServerFn({ method: "GET" })
       students: studentsRes.data ?? [],
     };
   });
+export const revealReporterCpf = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const [d, c] = await Promise.all([
+      context.supabase.rpc("has_role", { _user_id: context.userId, _role: "director" }),
+      context.supabase.rpc("has_role", { _user_id: context.userId, _role: "coordinator" }),
+    ]);
+    if (!d.data && !c.data) throw new Error("Apenas diretores e coordenadores podem revelar o CPF.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin.from("anonymous_reports").select("reporter_cpf").eq("id", data.id).single();
+    if (error) throw new Error("Não foi possível revelar o CPF.");
+    return { cpf: row?.reporter_cpf ?? null };
+  });
