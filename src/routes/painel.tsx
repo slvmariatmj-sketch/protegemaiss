@@ -425,7 +425,7 @@ function ReportsTab() {
   const removeFn = useServerFn(deleteAnonymousReport);
 
   const load = useCallback(async () => {
-    const { data, error } = await supabase.from("anonymous_reports").select("*").order("created_at", { ascending: false }).limit(100);
+    const { data, error } = await supabase.from("anonymous_reports").select("id, category, message, image_url, status, created_at, reporter_name, reporter_cpf_masked:reporter_cpf").order("created_at", { ascending: false }).limit(100);
     if (error) toast.error(error.message); else setList(data ?? []);
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -443,6 +443,17 @@ function ReportsTab() {
       load();
     } catch (e: any) {
       toast.error(e?.message ?? "Falha ao excluir.");
+    }
+  }
+
+  const revealFn = useServerFn(revealReporterCpf);
+  const [revealed, setRevealed] = useState<Record<string, string>>({});
+  async function reveal(id: string) {
+    try {
+      const res = await revealFn({ data: { id } });
+      if (res.cpf) setRevealed((p) => ({ ...p, [id]: res.cpf as string }));
+    } catch (e: any) {
+      toast.error(e?.message ?? "Sem permissão.");
     }
   }
 
@@ -476,9 +487,9 @@ function ReportsTab() {
                 </Button>
               </div>
             </div>
-            {(r.reporter_name || r.reporter_cpf) && (
+            {(r.reporter_name || r.reporter_cpf_masked) && (
               <p className="mt-1 text-xs font-medium text-[var(--brand-navy)]">
-                Por: {r.reporter_name || "Nome não informado"}{r.reporter_cpf ? ` — CPF: ${r.reporter_cpf}` : ""}
+                Por: {r.reporter_name || "Nome não informado"}{r.reporter_cpf_masked ? <> — CPF: {revealed[r.id] ?? maskCpf(r.reporter_cpf_masked)}{!revealed[r.id] && <button type="button" onClick={() => reveal(r.id)} className="ml-2 underline">Revelar</button>}</> : ""}
               </p>
             )}
             <p className="mt-2 text-sm">{r.message}</p>
@@ -496,6 +507,7 @@ function Field({ label, children, className = "" }: { label: string; children: R
 function groupBy<T>(arr: T[], key: (t: T) => string): Record<string, T[]> {
   return arr.reduce((acc, item) => { const k = key(item); (acc[k] ||= []).push(item); return acc; }, {} as Record<string, T[]>);
 }
+function maskCpf(c: string) { const d = (c || "").replace(/\D/g, ""); return d.length === 11 ? `***.${d.slice(3,6)}.***-**` : "***"; }
 function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 /* ---------------- Registrations ---------------- */
