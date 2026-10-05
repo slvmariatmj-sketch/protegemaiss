@@ -476,8 +476,10 @@ function ReportsTab() {
                 </Button>
               </div>
             </div>
-            {r.reporter_name && (
-              <p className="mt-1 text-xs font-medium text-[var(--brand-navy)]">Por: {r.reporter_name}</p>
+            {(r.reporter_name || r.reporter_cpf) && (
+              <p className="mt-1 text-xs font-medium text-[var(--brand-navy)]">
+                Por: {r.reporter_name || "Nome não informado"}{r.reporter_cpf ? ` — CPF: ${r.reporter_cpf}` : ""}
+              </p>
             )}
             <p className="mt-2 text-sm">{r.message}</p>
           </li>
