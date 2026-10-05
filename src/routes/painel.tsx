@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { toast } from "sonner";
 import { LogOut, Plus, Users, Megaphone, ShieldAlert, BookOpenCheck, ClipboardList, Trash2, UserCheck } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { deleteAnonymousReport, listRegistrations } from "@/lib/admin.functions";
+import { deleteAnonymousReport, listRegistrations, revealReporterCpf } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/painel")({
   ssr: false,
