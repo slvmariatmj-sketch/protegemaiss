@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProtegeLogo } from "@/components/protege-logo";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Users, ShieldAlert, Briefcase, Megaphone, CalendarDays, BookOpenCheck } from "lucide-react";
+import { GraduationCap, Users, ShieldAlert, Briefcase, Megaphone, ClipboardList, BookOpenCheck } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Landing,
