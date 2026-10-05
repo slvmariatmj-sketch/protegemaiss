@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { LogOut, Plus, Users, Megaphone, CalendarDays, ShieldAlert, BookOpenCheck, ClipboardList, Trash2, UserCheck } from "lucide-react";
+import { LogOut, Plus, Users, Megaphone, ShieldAlert, BookOpenCheck, ClipboardList, Trash2, UserCheck } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { deleteAnonymousReport, listRegistrations } from "@/lib/admin.functions";
 
@@ -73,7 +73,6 @@ function StaffPanel() {
             <TabsTrigger value="ocorrencias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><BookOpenCheck className="mr-2 h-4 w-4" />Ocorrências</TabsTrigger>
             <TabsTrigger value="faltas" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ClipboardList className="mr-2 h-4 w-4" />Faltas</TabsTrigger>
             <TabsTrigger value="comunicados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Megaphone className="mr-2 h-4 w-4" />Comunicados</TabsTrigger>
-            <TabsTrigger value="eventos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><CalendarDays className="mr-2 h-4 w-4" />Eventos</TabsTrigger>
             <TabsTrigger value="denuncias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>
             <TabsTrigger value="cadastrados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><UserCheck className="mr-2 h-4 w-4" />Cadastrados</TabsTrigger>
           </TabsList>
@@ -82,7 +81,6 @@ function StaffPanel() {
           <TabsContent value="ocorrencias" className="mt-8"><SectionHeader icon={BookOpenCheck} title="Ocorrências & Indisciplinas" subtitle="Registre acontecimentos relevantes da rotina escolar." /><OccurrencesTab /></TabsContent>
           <TabsContent value="faltas" className="mt-8"><SectionHeader icon={ClipboardList} title="Faltas & Presenças" subtitle="Controle diário de frequência dos alunos." /><AttendanceTab /></TabsContent>
           <TabsContent value="comunicados" className="mt-8"><SectionHeader icon={Megaphone} title="Comunicados" subtitle="Publique avisos para equipe, responsáveis e alunos." /><CommunicationsTab /></TabsContent>
-          <TabsContent value="eventos" className="mt-8"><SectionHeader icon={CalendarDays} title="Eventos da escola" subtitle="Agenda de atividades, reuniões e datas importantes." /><EventsTab /></TabsContent>
           <TabsContent value="denuncias" className="mt-8"><SectionHeader icon={ShieldAlert} title="Denúncias anônimas" subtitle="Acompanhe e atualize relatos recebidos." /><ReportsTab /></TabsContent>
           <TabsContent value="cadastrados" className="mt-8"><SectionHeader icon={UserCheck} title="Cadastrados na plataforma" subtitle="Toda a equipe e alunos que já se cadastraram." /><RegistrationsTab /></TabsContent>
         </Tabs>
@@ -417,62 +415,6 @@ function CommunicationDialog({ onSaved }: { onSaved: () => void }) {
         <Field label="Mensagem"><Textarea rows={5} value={f.content} onChange={(e) => setF({ ...f, content: e.target.value })} /></Field>
       </div>
       <DialogFooter><Button onClick={save} className="bg-[var(--brand-navy)]">Publicar</Button></DialogFooter>
-    </DialogContent>
-  );
-}
-
-/* ---------------- Events ---------------- */
-function EventsTab() {
-  const [list, setList] = useState<any[]>([]);
-  const [open, setOpen] = useState(false);
-  const load = useCallback(async () => {
-    const { data } = await supabase.from("school_events").select("*").order("event_date", { ascending: true }).limit(50);
-    if (data) setList(data);
-  }, []);
-  useEffect(() => { load(); }, [load]);
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button className="bg-[var(--brand-navy)]"><Plus className="mr-1 h-4 w-4" />Novo evento</Button></DialogTrigger>
-          <EventDialog onSaved={() => { setOpen(false); load(); }} />
-        </Dialog>
-      </div>
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {list.length === 0 && <p className="text-sm text-muted-foreground">Nenhum evento.</p>}
-        {list.map((e) => (
-          <Card key={e.id} className="p-4">
-            <p className="font-semibold">{e.title}</p>
-            <p className="text-xs text-muted-foreground">{new Date(e.event_date).toLocaleString("pt-BR")}{e.location ? ` · ${e.location}` : ""}</p>
-            {e.description && <p className="mt-2 text-sm">{e.description}</p>}
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-function EventDialog({ onSaved }: { onSaved: () => void }) {
-  const [f, setF] = useState({ title: "", description: "", location: "", event_date: "" });
-  async function save() {
-    if (!f.event_date) return toast.error("Informe a data.");
-    const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.from("school_events").insert({
-      title: f.title, description: f.description || null, location: f.location || null,
-      event_date: new Date(f.event_date).toISOString(), created_by: u.user?.id,
-    });
-    if (error) toast.error(error.message); else { toast.success("Evento criado."); onSaved(); }
-  }
-  return (
-    <DialogContent>
-      <DialogHeader><DialogTitle>Novo evento</DialogTitle></DialogHeader>
-      <div className="space-y-3">
-        <Field label="Título"><Input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></Field>
-        <Field label="Data e hora"><Input type="datetime-local" value={f.event_date} onChange={(e) => setF({ ...f, event_date: e.target.value })} /></Field>
-        <Field label="Local"><Input value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} /></Field>
-        <Field label="Descrição"><Textarea rows={3} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} /></Field>
-      </div>
-      <DialogFooter><Button onClick={save} className="bg-[var(--brand-navy)]">Salvar</Button></DialogFooter>
     </DialogContent>
   );
 }
