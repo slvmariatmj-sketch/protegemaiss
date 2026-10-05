@@ -68,7 +68,7 @@ export const getPortalData = createServerFn({ method: "POST" })
     const payload = verifyPortalToken(data.token);
     if (!payload) throw new Error("Sessão expirada. Faça login novamente.");
 
-    const [studentRes, occRes, attRes, commRes, evRes] = await Promise.all([
+    const [studentRes, occRes, attRes, commRes] = await Promise.all([
       supabaseAdmin.from("students").select("*").eq("id", payload.sid).maybeSingle(),
       supabaseAdmin
         .from("occurrences")
@@ -87,12 +87,6 @@ export const getPortalData = createServerFn({ method: "POST" })
         .in("audience", ["all", payload.kind === "parent" ? "parents" : "students"])
         .order("created_at", { ascending: false })
         .limit(20),
-      supabaseAdmin
-        .from("school_events")
-        .select("*")
-        .gte("event_date", new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString())
-        .order("event_date", { ascending: true })
-        .limit(20),
     ]);
 
     if (!studentRes.data) throw new Error("Aluno não encontrado.");
@@ -106,6 +100,5 @@ export const getPortalData = createServerFn({ method: "POST" })
       attendance: attRes.data ?? [],
       absences,
       communications: commRes.data ?? [],
-      events: evRes.data ?? [],
     };
   });

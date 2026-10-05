@@ -112,19 +112,6 @@ export function PortalView({ kind }: { kind: "student" | "parent" }) {
         </Card>
       </div>
 
-      <Card className="mt-6 p-5">
-        <h3 className="font-semibold">Próximos eventos</h3>
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-          {data.events.length === 0 && <li className="text-sm text-muted-foreground">Sem eventos no momento.</li>}
-          {data.events.map((e) => (
-            <li key={e.id} className="rounded-lg border border-border p-3">
-              <p className="font-medium text-sm">{e.title}</p>
-              <p className="text-xs text-muted-foreground">{new Date(e.event_date).toLocaleString("pt-BR")}{e.location ? ` · ${e.location}` : ""}</p>
-              {e.description && <p className="mt-1 text-sm text-muted-foreground">{e.description}</p>}
-            </li>
-          ))}
-        </ul>
-      </Card>
 
       <div className="mt-8 flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-5">
         <div className="flex items-center gap-3">
