@@ -31,7 +31,7 @@ const accesses = [
 
 const features = [
   { icon: BookOpenCheck, title: "Ocorrências e indisciplinas", desc: "Registro detalhado por aluno, série e turno." },
-  { icon: CalendarDays, title: "Faltas e eventos", desc: "Controle de presença e calendário escolar." },
+  { icon: ClipboardList, title: "Faltas e presenças", desc: "Controle de frequência por aluno, série e turno." },
   { icon: Megaphone, title: "Comunicados oficiais", desc: "Mensagens segmentadas para equipe, pais ou alunos." },
   { icon: ShieldAlert, title: "Denúncia anônima", desc: "Canal seguro com anexo de imagens, sem identificação." },
 ];
@@ -55,7 +55,7 @@ function Landing() {
               A gestão escolar segura e organizada para toda a comunidade.
             </h1>
             <p className="mt-5 max-w-lg text-white/80">
-              Registre ocorrências, faltas, comunicados e eventos. Pais e alunos acompanham o desempenho em tempo real.
+              Registre ocorrências, faltas e comunicados. Pais e alunos acompanham o desempenho em tempo real.
               Um canal anônimo protege quem precisa falar.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">

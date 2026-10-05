@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Protege Mais — Gestão Escolar" },
-      { name: "description", content: "Plataforma de gestão escolar Protege Mais: ocorrências, faltas, comunicados, eventos e denúncias anônimas." },
+      { name: "description", content: "Plataforma de gestão escolar Protege Mais: ocorrências, faltas, comunicados e denúncias anônimas." },
       { property: "og:title", content: "Protege Mais — Gestão Escolar" },
       { property: "og:description", content: "Defendendo sua integridade todo dia." },
       { property: "og:type", content: "website" },
