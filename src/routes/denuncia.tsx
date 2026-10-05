@@ -23,6 +23,7 @@ function ReportPage() {
   const upload = useServerFn(uploadReportImage);
   const [category, setCategory] = useState(categories[0]);
   const [reporterName, setReporterName] = useState("");
+  const [reporterCpf, setReporterCpf] = useState("");
   const [message, setMessage] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -47,7 +48,9 @@ function ReportPage() {
         const res = await upload({ data: { filename: file.name, contentBase64, contentType: file.type } });
         imagePath = res.path;
       }
-      await submit({ data: { category, reporter_name: reporterName.trim(), message, image_path: imagePath } });
+      const cpfDigits = reporterCpf.replace(/\D/g, "");
+      if (cpfDigits.length !== 11) throw new Error("CPF deve ter 11 dígitos (somente números).");
+      await submit({ data: { category, reporter_name: reporterName.trim() || null, reporter_cpf: cpfDigits, message, image_path: imagePath } });
       setDone(true);
       toast.success("Denúncia enviada com segurança.");
     } catch (err: any) {
@@ -95,8 +98,12 @@ function ReportPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="name">Seu nome</Label>
-                <Input id="name" required value={reporterName} onChange={(e) => setReporterName(e.target.value)} placeholder="Nome completo" />
+                <Label htmlFor="name">Seu nome (opcional)</Label>
+                <Input id="name" value={reporterName} onChange={(e) => setReporterName(e.target.value)} placeholder="Nome completo" />
+              </div>
+              <div>
+                <Label htmlFor="cpf">Seu CPF *</Label>
+                <Input id="cpf" required inputMode="numeric" maxLength={14} value={reporterCpf} onChange={(e) => setReporterCpf(e.target.value)} placeholder="Somente números, 11 dígitos" />
               </div>
               <div>
                 <Label htmlFor="cat">Categoria</Label>

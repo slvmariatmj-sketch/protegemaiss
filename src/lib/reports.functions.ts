@@ -4,7 +4,8 @@ import { z } from "zod";
 const schema = z.object({
   category: z.string().trim().min(1).max(80),
   message: z.string().trim().min(10).max(4000),
-  reporter_name: z.string().trim().min(1).max(120),
+  reporter_name: z.string().trim().max(120).optional().nullable(),
+  reporter_cpf: z.string().trim().regex(/^\d{11}$/, "CPF deve ter 11 dígitos (somente números)."),
   image_path: z.string().trim().max(300).optional().nullable(),
 });
 
@@ -15,7 +16,8 @@ export const submitAnonymousReport = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin.from("anonymous_reports").insert({
       category: data.category,
       message: data.message,
-      reporter_name: data.reporter_name,
+      reporter_name: data.reporter_name?.trim() || null,
+      reporter_cpf: data.reporter_cpf,
       image_url: data.image_path ?? null,
     });
     if (error) throw new Error("Não foi possível enviar a denúncia.");
