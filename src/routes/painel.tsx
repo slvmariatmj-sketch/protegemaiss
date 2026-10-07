@@ -33,7 +33,7 @@ function StaffPanel() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getSession().then(({ data: s }) => { const data = { user: s.session?.user };
       if (!data.user) { nav({ to: "/auth/equipe" }); return; }
       setUserEmail(data.user.email ?? null);
       setChecking(false);
@@ -259,7 +259,7 @@ function OccurrenceDialog({ students, onSaved }: { students: Student[]; onSaved:
   const [f, setF] = useState({ student_id: students[0]?.id ?? "", type: "ocorrencia", title: "", description: "" });
   async function save() {
     if (!f.student_id) return toast.error("Cadastre um aluno antes.");
-    const { data: u } = await supabase.auth.getUser();
+    const { data: { session: _s } } = await supabase.auth.getSession(); const u = { user: _s?.user ?? null };
     const { error } = await supabase.from("occurrences").insert({ ...f, created_by: u.user?.id });
     if (error) toast.error(error.message); else { toast.success("Ocorrência registrada."); onSaved(); }
   }
@@ -333,7 +333,7 @@ function AttendanceDialog({ students, onSaved }: { students: Student[]; onSaved:
   const [f, setF] = useState({ student_id: students[0]?.id ?? "", date: new Date().toISOString().slice(0, 10), status: "falta", notes: "" });
   async function save() {
     if (!f.student_id) return toast.error("Cadastre um aluno antes.");
-    const { data: u } = await supabase.auth.getUser();
+    const { data: { session: _s } } = await supabase.auth.getSession(); const u = { user: _s?.user ?? null };
     const { error } = await supabase.from("attendance").insert({ ...f, created_by: u.user?.id });
     if (error) toast.error(error.message); else { toast.success("Registrado."); onSaved(); }
   }
@@ -397,7 +397,7 @@ function CommunicationsTab() {
 function CommunicationDialog({ onSaved }: { onSaved: () => void }) {
   const [f, setF] = useState({ title: "", content: "", audience: "all" });
   async function save() {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: { session: _s } } = await supabase.auth.getSession(); const u = { user: _s?.user ?? null };
     const { error } = await supabase.from("communications").insert({ ...f, created_by: u.user?.id });
     if (error) toast.error(error.message); else { toast.success("Comunicado publicado."); onSaved(); }
   }
