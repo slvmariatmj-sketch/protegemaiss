@@ -49,7 +49,7 @@ function StaffAuth() {
             .upsert({ user_id: userId, role, full_name: name }, { onConflict: "user_id,role" });
           if (roleErr) throw roleErr;
         }
-        toast.success("Conta criada e equipe vinculada.");
+        toast.success("Conta criada! Aguarde a aprovação de um(a) diretor(a).");
         navigate({ to: "/painel" });
       } else {
         const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password });
