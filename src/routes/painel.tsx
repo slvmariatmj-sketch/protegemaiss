@@ -32,18 +32,22 @@ function StaffPanel() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
   const [canReports, setCanReports] = useState(false);
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: s }) => {
-      const id = s.session?.user.id;
-      if (!id) return;
-      supabase.rpc("can_view_reports", { _user_id: id }).then(({ data }) => setCanReports(!!data));
-    });
-  }, []);
+  const [isDirector, setIsDirector] = useState(false);
+  const [approved, setApproved] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: s }) => { const data = { user: s.session?.user };
-      if (!data.user) { nav({ to: "/auth/equipe" }); return; }
-      setUserEmail(data.user.email ?? null);
+    supabase.auth.getSession().then(async ({ data: s }) => {
+      const user = s.session?.user;
+      if (!user) { nav({ to: "/auth/equipe" }); return; }
+      setUserEmail(user.email ?? null);
+      const [st, rp, dr] = await Promise.all([
+        supabase.rpc("is_staff", { _user_id: user.id }),
+        supabase.rpc("can_view_reports", { _user_id: user.id }),
+        supabase.rpc("has_role", { _user_id: user.id, _role: "director" }),
+      ]);
+      setApproved(!!st.data);
+      setCanReports(!!rp.data);
+      setIsDirector(!!dr.data);
       setChecking(false);
     });
   }, [nav]);
@@ -54,6 +58,21 @@ function StaffPanel() {
   }
 
   if (checking) return <div className="grid min-h-screen place-items-center text-muted-foreground">Carregando...</div>;
+
+  if (!approved) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-secondary/40 px-4">
+        <Card className="max-w-md p-8 text-center">
+          <UserCheck className="mx-auto h-10 w-10 text-[var(--brand-navy)]" />
+          <h1 className="mt-4 text-xl font-bold">Cadastro aguardando aprovação</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Um(a) diretor(a) precisa aprovar e confirmar seu cargo antes de você acessar o painel. Tente novamente mais tarde.
+          </p>
+          <Button onClick={logout} variant="outline" className="mt-6"><LogOut className="mr-2 h-4 w-4" />Sair</Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-secondary/40">
