@@ -224,6 +224,7 @@ export type Database = {
       }
       user_roles: {
         Row: {
+          approved: boolean
           created_at: string
           full_name: string | null
           id: string
@@ -231,6 +232,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approved?: boolean
           created_at?: string
           full_name?: string | null
           id?: string
@@ -238,6 +240,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approved?: boolean
           created_at?: string
           full_name?: string | null
           id?: string
