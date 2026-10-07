@@ -2,6 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+async function assertReportManager(context: any) {
+  const { data, error } = await context.supabase.rpc("can_view_reports", { _user_id: context.userId });
+  if (error || !data) throw new Error("Acesso restrito a diretores, pedagogos e coordenadores.");
+}
+
 async function assertStaff(context: any) {
   const { data, error } = await context.supabase.rpc("is_staff", { _user_id: context.userId });
   if (error || !data) throw new Error("Acesso restrito à equipe.");
@@ -11,7 +16,7 @@ export const deleteAnonymousReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertStaff(context);
+    await assertReportManager(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("anonymous_reports").delete().eq("id", data.id);
     if (error) throw new Error("Não foi possível excluir a denúncia.");
