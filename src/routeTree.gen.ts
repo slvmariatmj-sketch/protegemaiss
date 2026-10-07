@@ -9,18 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PainelRouteImport } from './routes/painel'
-import { Route as DenunciaRouteImport } from './routes/denuncia'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PortalResponsavelRouteImport } from './routes/portal.responsavel'
-import { Route as PortalAlunoRouteImport } from './routes/portal.aluno'
-import { Route as AuthResponsavelRouteImport } from './routes/auth.responsavel'
-import { Route as AuthEquipeRouteImport } from './routes/auth.equipe'
+import { Route as DenunciaRouteImport } from './routes/denuncia'
+import { Route as PainelRouteImport } from './routes/painel'
 import { Route as AuthAlunoRouteImport } from './routes/auth.aluno'
+import { Route as AuthEquipeRouteImport } from './routes/auth.equipe'
+import { Route as AuthResponsavelRouteImport } from './routes/auth.responsavel'
+import { Route as PortalAlunoRouteImport } from './routes/portal.aluno'
+import { Route as PortalResponsavelRouteImport } from './routes/portal.responsavel'
 
-const PainelRoute = PainelRouteImport.update({
-  id: '/painel',
-  path: '/painel',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DenunciaRoute = DenunciaRouteImport.update({
@@ -28,24 +28,14 @@ const DenunciaRoute = DenunciaRouteImport.update({
   path: '/denuncia',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PortalResponsavelRoute = PortalResponsavelRouteImport.update({
-  id: '/portal/responsavel',
-  path: '/portal/responsavel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalAlunoRoute = PortalAlunoRouteImport.update({
-  id: '/portal/aluno',
-  path: '/portal/aluno',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthResponsavelRoute = AuthResponsavelRouteImport.update({
-  id: '/auth/responsavel',
-  path: '/auth/responsavel',
+const AuthAlunoRoute = AuthAlunoRouteImport.update({
+  id: '/auth/aluno',
+  path: '/auth/aluno',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthEquipeRoute = AuthEquipeRouteImport.update({
@@ -53,9 +43,19 @@ const AuthEquipeRoute = AuthEquipeRouteImport.update({
   path: '/auth/equipe',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthAlunoRoute = AuthAlunoRouteImport.update({
-  id: '/auth/aluno',
-  path: '/auth/aluno',
+const AuthResponsavelRoute = AuthResponsavelRouteImport.update({
+  id: '/auth/responsavel',
+  path: '/auth/responsavel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalAlunoRoute = PortalAlunoRouteImport.update({
+  id: '/portal/aluno',
+  path: '/portal/aluno',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalResponsavelRoute = PortalResponsavelRouteImport.update({
+  id: '/portal/responsavel',
+  path: '/portal/responsavel',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -136,11 +136,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/painel': {
-      id: '/painel'
-      path: '/painel'
-      fullPath: '/painel'
-      preLoaderRoute: typeof PainelRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/denuncia': {
@@ -150,32 +150,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DenunciaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/portal/responsavel': {
-      id: '/portal/responsavel'
-      path: '/portal/responsavel'
-      fullPath: '/portal/responsavel'
-      preLoaderRoute: typeof PortalResponsavelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal/aluno': {
-      id: '/portal/aluno'
-      path: '/portal/aluno'
-      fullPath: '/portal/aluno'
-      preLoaderRoute: typeof PortalAlunoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/responsavel': {
-      id: '/auth/responsavel'
-      path: '/auth/responsavel'
-      fullPath: '/auth/responsavel'
-      preLoaderRoute: typeof AuthResponsavelRouteImport
+    '/auth/aluno': {
+      id: '/auth/aluno'
+      path: '/auth/aluno'
+      fullPath: '/auth/aluno'
+      preLoaderRoute: typeof AuthAlunoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/equipe': {
@@ -185,11 +171,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthEquipeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/aluno': {
-      id: '/auth/aluno'
-      path: '/auth/aluno'
-      fullPath: '/auth/aluno'
-      preLoaderRoute: typeof AuthAlunoRouteImport
+    '/auth/responsavel': {
+      id: '/auth/responsavel'
+      path: '/auth/responsavel'
+      fullPath: '/auth/responsavel'
+      preLoaderRoute: typeof AuthResponsavelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/aluno': {
+      id: '/portal/aluno'
+      path: '/portal/aluno'
+      fullPath: '/portal/aluno'
+      preLoaderRoute: typeof PortalAlunoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/responsavel': {
+      id: '/portal/responsavel'
+      path: '/portal/responsavel'
+      fullPath: '/portal/responsavel'
+      preLoaderRoute: typeof PortalResponsavelRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
