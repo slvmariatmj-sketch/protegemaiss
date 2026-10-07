@@ -8,6 +8,13 @@
       "when": 1791382854018,
       "tag": "0000_restrict_reports_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791382996547,
+      "tag": "0001_staff_approval",
+      "breakpoints": true
     }
   ]
 }

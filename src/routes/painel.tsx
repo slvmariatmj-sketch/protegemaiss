@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { toast } from "sonner";
 import { LogOut, Plus, Users, Megaphone, ShieldAlert, BookOpenCheck, ClipboardList, Trash2, UserCheck } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { deleteAnonymousReport, listRegistrations, revealReporterCpf } from "@/lib/admin.functions";
+import { deleteAnonymousReport, listRegistrations, revealReporterCpf, listPendingStaff, approveStaff, rejectStaff } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/painel")({
   ssr: false,
@@ -32,18 +32,22 @@ function StaffPanel() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
   const [canReports, setCanReports] = useState(false);
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: s }) => {
-      const id = s.session?.user.id;
-      if (!id) return;
-      supabase.rpc("can_view_reports", { _user_id: id }).then(({ data }) => setCanReports(!!data));
-    });
-  }, []);
+  const [isDirector, setIsDirector] = useState(false);
+  const [approved, setApproved] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: s }) => { const data = { user: s.session?.user };
-      if (!data.user) { nav({ to: "/auth/equipe" }); return; }
-      setUserEmail(data.user.email ?? null);
+    supabase.auth.getSession().then(async ({ data: s }) => {
+      const user = s.session?.user;
+      if (!user) { nav({ to: "/auth/equipe" }); return; }
+      setUserEmail(user.email ?? null);
+      const [st, rp, dr] = await Promise.all([
+        supabase.rpc("is_staff", { _user_id: user.id }),
+        supabase.rpc("can_view_reports", { _user_id: user.id }),
+        supabase.rpc("has_role", { _user_id: user.id, _role: "director" }),
+      ]);
+      setApproved(!!st.data);
+      setCanReports(!!rp.data);
+      setIsDirector(!!dr.data);
       setChecking(false);
     });
   }, [nav]);
@@ -54,6 +58,21 @@ function StaffPanel() {
   }
 
   if (checking) return <div className="grid min-h-screen place-items-center text-muted-foreground">Carregando...</div>;
+
+  if (!approved) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-secondary/40 px-4">
+        <Card className="max-w-md p-8 text-center">
+          <UserCheck className="mx-auto h-10 w-10 text-[var(--brand-navy)]" />
+          <h1 className="mt-4 text-xl font-bold">Cadastro aguardando aprovação</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Um(a) diretor(a) precisa aprovar e confirmar seu cargo antes de você acessar o painel. Tente novamente mais tarde.
+          </p>
+          <Button onClick={logout} variant="outline" className="mt-6"><LogOut className="mr-2 h-4 w-4" />Sair</Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-secondary/40">
@@ -76,12 +95,13 @@ function StaffPanel() {
       </header>
       <main className="mx-auto max-w-7xl px-5 py-8">
         <Tabs defaultValue="alunos" className="w-full">
-          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-7">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-3 lg:grid-cols-8">
             <TabsTrigger value="alunos" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Users className="mr-2 h-4 w-4" />Alunos</TabsTrigger>
             <TabsTrigger value="ocorrencias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><BookOpenCheck className="mr-2 h-4 w-4" />Ocorrências</TabsTrigger>
             <TabsTrigger value="faltas" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ClipboardList className="mr-2 h-4 w-4" />Faltas</TabsTrigger>
             <TabsTrigger value="comunicados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Megaphone className="mr-2 h-4 w-4" />Comunicados</TabsTrigger>
             {canReports && <TabsTrigger value="denuncias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>}
+            {isDirector && <TabsTrigger value="aprovacoes" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><UserCheck className="mr-2 h-4 w-4" />Aprovações</TabsTrigger>}
             <TabsTrigger value="cadastrados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><UserCheck className="mr-2 h-4 w-4" />Cadastrados</TabsTrigger>
           </TabsList>
 
@@ -90,6 +110,7 @@ function StaffPanel() {
           <TabsContent value="faltas" className="mt-8"><SectionHeader icon={ClipboardList} title="Faltas & Presenças" subtitle="Controle diário de frequência dos alunos." /><AttendanceTab /></TabsContent>
           <TabsContent value="comunicados" className="mt-8"><SectionHeader icon={Megaphone} title="Comunicados" subtitle="Publique avisos para equipe, responsáveis e alunos." /><CommunicationsTab /></TabsContent>
           {canReports && <TabsContent value="denuncias" className="mt-8"><SectionHeader icon={ShieldAlert} title="Denúncias anônimas" subtitle="Acompanhe e atualize relatos recebidos." /><ReportsTab /></TabsContent>}
+          {isDirector && <TabsContent value="aprovacoes" className="mt-8"><SectionHeader icon={UserCheck} title="Aprovação de funcionários" subtitle="Aprove ou corrija o cargo antes de liberar o acesso ao painel." /><ApprovalsTab /></TabsContent>}
           <TabsContent value="cadastrados" className="mt-8"><SectionHeader icon={UserCheck} title="Cadastrados na plataforma" subtitle="Toda a equipe e alunos que já se cadastraram." /><RegistrationsTab /></TabsContent>
         </Tabs>
       </main>
@@ -588,6 +609,60 @@ function RegistrationsTab() {
           ))}
         </ul>
       </Card>
+    </div>
+  );
+}
+function ApprovalsTab() {
+  const list = useServerFn(listPendingStaff);
+  const approve = useServerFn(approveStaff);
+  const reject = useServerFn(rejectStaff);
+  const [rows, setRows] = useState<Array<{ id: string; full_name: string | null; email: string; role: string; created_at: string }>>([]);
+  const [roles, setRoles] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+  const load = useCallback(async () => {
+    setLoading(true);
+    try { setRows(await list()); } catch (e: any) { toast.error(e.message); } finally { setLoading(false); }
+  }, [list]);
+  useEffect(() => { load(); }, [load]);
+
+  async function doApprove(id: string, current: string) {
+    try {
+      await approve({ data: { id, role: (roles[id] ?? current) as any } });
+      toast.success("Funcionário aprovado.");
+      load();
+    } catch (e: any) { toast.error(e.message); }
+  }
+  async function doReject(id: string) {
+    if (!confirm("Recusar este cadastro?")) return;
+    try { await reject({ data: { id } }); toast.success("Cadastro recusado."); load(); } catch (e: any) { toast.error(e.message); }
+  }
+
+  if (loading) return <p className="text-muted-foreground">Carregando...</p>;
+  if (!rows.length) return <Card className="p-8 text-center text-muted-foreground">Nenhum cadastro aguardando aprovação.</Card>;
+  return (
+    <div className="space-y-3">
+      {rows.map((r) => (
+        <Card key={r.id} className="flex flex-wrap items-center justify-between gap-4 p-5">
+          <div>
+            <p className="font-semibold">{r.full_name || "Sem nome"}</p>
+            <p className="text-sm text-muted-foreground">{r.email} · {new Date(r.created_at).toLocaleDateString("pt-BR")}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={roles[r.id] ?? r.role}
+              onChange={(e) => setRoles({ ...roles, [r.id]: e.target.value })}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            >
+              <option value="teacher">Professor(a)</option>
+              <option value="coordinator">Coordenador(a)</option>
+              <option value="director">Diretor(a)</option>
+              <option value="pedagogue">Pedagogo(a)</option>
+            </select>
+            <Button onClick={() => doApprove(r.id, r.role)} className="bg-[var(--brand-navy)] hover:bg-[var(--brand-navy-deep)]">Aprovar</Button>
+            <Button variant="outline" onClick={() => doReject(r.id)}><Trash2 className="mr-1 h-4 w-4" />Recusar</Button>
+          </div>
+        </Card>
+      ))}
     </div>
   );
 }
