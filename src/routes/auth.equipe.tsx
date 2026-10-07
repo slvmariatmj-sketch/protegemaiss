@@ -56,18 +56,22 @@ function StaffAuth() {
         if (error) throw error;
         // Se a conta antiga ficou sem papel (cadastro anterior bugado), grava agora
         if (signIn.user) {
-          const { data: existing } = await supabase
+          const u = signIn.user;
+          // Em segundo plano: não bloqueia a entrada
+          void supabase
             .from("user_roles")
             .select("id")
-            .eq("user_id", signIn.user.id)
-            .maybeSingle();
-          if (!existing) {
-            await supabase.from("user_roles").insert({
-              user_id: signIn.user.id,
-              role: "teacher",
-              full_name: signIn.user.email ?? "Equipe",
+            .eq("user_id", u.id)
+            .maybeSingle()
+            .then(({ data: existing }) => {
+              if (!existing) {
+                void supabase.from("user_roles").insert({
+                  user_id: u.id,
+                  role: "teacher",
+                  full_name: u.email ?? "Equipe",
+                });
+              }
             });
-          }
         }
         toast.success("Bem-vindo(a)!");
         navigate({ to: "/painel" });
