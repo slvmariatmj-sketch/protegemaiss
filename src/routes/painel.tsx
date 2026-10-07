@@ -31,6 +31,14 @@ function StaffPanel() {
   const nav = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
+  const [canReports, setCanReports] = useState(false);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: s }) => {
+      const id = s.session?.user.id;
+      if (!id) return;
+      supabase.rpc("can_view_reports", { _user_id: id }).then(({ data }) => setCanReports(!!data));
+    });
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: s }) => { const data = { user: s.session?.user };
@@ -73,7 +81,7 @@ function StaffPanel() {
             <TabsTrigger value="ocorrencias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><BookOpenCheck className="mr-2 h-4 w-4" />Ocorrências</TabsTrigger>
             <TabsTrigger value="faltas" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ClipboardList className="mr-2 h-4 w-4" />Faltas</TabsTrigger>
             <TabsTrigger value="comunicados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><Megaphone className="mr-2 h-4 w-4" />Comunicados</TabsTrigger>
-            {canReports && <TabsTrigger value="denuncias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>
+            {canReports && <TabsTrigger value="denuncias" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><ShieldAlert className="mr-2 h-4 w-4" />Denúncias</TabsTrigger>}
             <TabsTrigger value="cadastrados" className="h-14 rounded-xl border border-border bg-card text-sm font-medium shadow-sm data-[state=active]:border-[var(--brand-navy)] data-[state=active]:bg-[var(--brand-navy)] data-[state=active]:text-white"><UserCheck className="mr-2 h-4 w-4" />Cadastrados</TabsTrigger>
           </TabsList>
 
@@ -81,7 +89,7 @@ function StaffPanel() {
           <TabsContent value="ocorrencias" className="mt-8"><SectionHeader icon={BookOpenCheck} title="Ocorrências & Indisciplinas" subtitle="Registre acontecimentos relevantes da rotina escolar." /><OccurrencesTab /></TabsContent>
           <TabsContent value="faltas" className="mt-8"><SectionHeader icon={ClipboardList} title="Faltas & Presenças" subtitle="Controle diário de frequência dos alunos." /><AttendanceTab /></TabsContent>
           <TabsContent value="comunicados" className="mt-8"><SectionHeader icon={Megaphone} title="Comunicados" subtitle="Publique avisos para equipe, responsáveis e alunos." /><CommunicationsTab /></TabsContent>
-          <TabsContent value="denuncias" className="mt-8"><SectionHeader icon={ShieldAlert} title="Denúncias anônimas" subtitle="Acompanhe e atualize relatos recebidos." /><ReportsTab /></TabsContent>
+          {canReports && <TabsContent value="denuncias" className="mt-8"><SectionHeader icon={ShieldAlert} title="Denúncias anônimas" subtitle="Acompanhe e atualize relatos recebidos." /><ReportsTab /></TabsContent>}
           <TabsContent value="cadastrados" className="mt-8"><SectionHeader icon={UserCheck} title="Cadastrados na plataforma" subtitle="Toda a equipe e alunos que já se cadastraram." /><RegistrationsTab /></TabsContent>
         </Tabs>
       </main>
