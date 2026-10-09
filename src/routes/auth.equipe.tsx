@@ -135,7 +135,18 @@ function StaffAuth() {
           <Input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
-          <Label htmlFor="password">Senha</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Senha</Label>
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={forgotPassword}
+                className="text-xs text-muted-foreground underline hover:text-foreground"
+              >
+                Esqueci a senha
+              </button>
+            )}
+          </div>
           <Input id="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
         </div>
         <Button type="submit" disabled={loading} className="w-full bg-[var(--brand-navy)] hover:bg-[var(--brand-navy-deep)]">

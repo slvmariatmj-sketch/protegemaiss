@@ -14,6 +14,7 @@ import { Route as DenunciaRouteImport } from './routes/denuncia'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as AuthAlunoRouteImport } from './routes/auth.aluno'
 import { Route as AuthEquipeRouteImport } from './routes/auth.equipe'
+import { Route as AuthRedefinirSenhaRouteImport } from './routes/auth.redefinir-senha'
 import { Route as AuthResponsavelRouteImport } from './routes/auth.responsavel'
 import { Route as PortalAlunoRouteImport } from './routes/portal.aluno'
 import { Route as PortalResponsavelRouteImport } from './routes/portal.responsavel'
@@ -43,6 +44,11 @@ const AuthEquipeRoute = AuthEquipeRouteImport.update({
   path: '/auth/equipe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRedefinirSenhaRoute = AuthRedefinirSenhaRouteImport.update({
+  id: '/auth/redefinir-senha',
+  path: '/auth/redefinir-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthResponsavelRoute = AuthResponsavelRouteImport.update({
   id: '/auth/responsavel',
   path: '/auth/responsavel',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/painel': typeof PainelRoute
   '/auth/aluno': typeof AuthAlunoRoute
   '/auth/equipe': typeof AuthEquipeRoute
+  '/auth/redefinir-senha': typeof AuthRedefinirSenhaRoute
   '/auth/responsavel': typeof AuthResponsavelRoute
   '/portal/aluno': typeof PortalAlunoRoute
   '/portal/responsavel': typeof PortalResponsavelRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/painel': typeof PainelRoute
   '/auth/aluno': typeof AuthAlunoRoute
   '/auth/equipe': typeof AuthEquipeRoute
+  '/auth/redefinir-senha': typeof AuthRedefinirSenhaRoute
   '/auth/responsavel': typeof AuthResponsavelRoute
   '/portal/aluno': typeof PortalAlunoRoute
   '/portal/responsavel': typeof PortalResponsavelRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/painel': typeof PainelRoute
   '/auth/aluno': typeof AuthAlunoRoute
   '/auth/equipe': typeof AuthEquipeRoute
+  '/auth/redefinir-senha': typeof AuthRedefinirSenhaRoute
   '/auth/responsavel': typeof AuthResponsavelRoute
   '/portal/aluno': typeof PortalAlunoRoute
   '/portal/responsavel': typeof PortalResponsavelRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/painel'
     | '/auth/aluno'
     | '/auth/equipe'
+    | '/auth/redefinir-senha'
     | '/auth/responsavel'
     | '/portal/aluno'
     | '/portal/responsavel'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/painel'
     | '/auth/aluno'
     | '/auth/equipe'
+    | '/auth/redefinir-senha'
     | '/auth/responsavel'
     | '/portal/aluno'
     | '/portal/responsavel'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/painel'
     | '/auth/aluno'
     | '/auth/equipe'
+    | '/auth/redefinir-senha'
     | '/auth/responsavel'
     | '/portal/aluno'
     | '/portal/responsavel'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   PainelRoute: typeof PainelRoute
   AuthAlunoRoute: typeof AuthAlunoRoute
   AuthEquipeRoute: typeof AuthEquipeRoute
+  AuthRedefinirSenhaRoute: typeof AuthRedefinirSenhaRoute
   AuthResponsavelRoute: typeof AuthResponsavelRoute
   PortalAlunoRoute: typeof PortalAlunoRoute
   PortalResponsavelRoute: typeof PortalResponsavelRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthEquipeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/redefinir-senha': {
+      id: '/auth/redefinir-senha'
+      path: '/auth/redefinir-senha'
+      fullPath: '/auth/redefinir-senha'
+      preLoaderRoute: typeof AuthRedefinirSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/responsavel': {
       id: '/auth/responsavel'
       path: '/auth/responsavel'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   PainelRoute: PainelRoute,
   AuthAlunoRoute: AuthAlunoRoute,
   AuthEquipeRoute: AuthEquipeRoute,
+  AuthRedefinirSenhaRoute: AuthRedefinirSenhaRoute,
   AuthResponsavelRoute: AuthResponsavelRoute,
   PortalAlunoRoute: PortalAlunoRoute,
   PortalResponsavelRoute: PortalResponsavelRoute,
