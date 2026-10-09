@@ -21,6 +21,25 @@ function StaffAuth() {
   const [role, setRole] = useState<"coordinator" | "teacher" | "director" | "pedagogue">("teacher");
   const [loading, setLoading] = useState(false);
 
+  async function forgotPassword() {
+    if (!email) {
+      toast.error("Digite seu e-mail institucional para recuperar a senha.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + "/auth/redefinir-senha",
+      });
+      if (error) throw error;
+      toast.success("Enviamos um link de recuperação para o seu e-mail.");
+    } catch (err: any) {
+      toast.error(err.message ?? "Não foi possível enviar o e-mail de recuperação.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
