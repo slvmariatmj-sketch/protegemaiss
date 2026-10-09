@@ -248,7 +248,7 @@ function OccurrencesTab() {
   const load = useCallback(async () => {
     const [a, b] = await Promise.all([
       supabase.from("occurrences").select("*, students(full_name, grade, shift)").order("created_at", { ascending: false }).limit(100),
-      supabase.from("students").select("id, full_name, registration_number, cpf, grade, shift, guardian_name, guardian_cpf, performance_grade, performance_notes").order("full_name"),
+      supabase.from("students").select("id, full_name, grade, shift").order("full_name"),
     ]);
     if (a.data) setList(a.data);
     if (b.data) setStudents(b.data as Student[]);
@@ -325,7 +325,7 @@ function AttendanceTab() {
   const load = useCallback(async () => {
     const [a, b] = await Promise.all([
       supabase.from("attendance").select("*, students(full_name, grade, shift)").order("date", { ascending: false }).limit(100),
-      supabase.from("students").select("id, full_name, registration_number, cpf, grade, shift, guardian_name, guardian_cpf, performance_grade, performance_notes").order("full_name"),
+      supabase.from("students").select("id, full_name, grade, shift").order("full_name"),
     ]);
     if (a.data) setList(a.data);
     if (b.data) setStudents(b.data as Student[]);
