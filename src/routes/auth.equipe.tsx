@@ -21,6 +21,25 @@ function StaffAuth() {
   const [role, setRole] = useState<"coordinator" | "teacher" | "director" | "pedagogue">("teacher");
   const [loading, setLoading] = useState(false);
 
+  async function forgotPassword() {
+    if (!email) {
+      toast.error("Digite seu e-mail institucional para recuperar a senha.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + "/auth/redefinir-senha",
+      });
+      if (error) throw error;
+      toast.success("Enviamos um link de recuperação para o seu e-mail.");
+    } catch (err: any) {
+      toast.error(err.message ?? "Não foi possível enviar o e-mail de recuperação.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -116,7 +135,18 @@ function StaffAuth() {
           <Input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
-          <Label htmlFor="password">Senha</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Senha</Label>
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={forgotPassword}
+                className="text-xs text-muted-foreground underline hover:text-foreground"
+              >
+                Esqueci a senha
+              </button>
+            )}
+          </div>
           <Input id="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
         </div>
         <Button type="submit" disabled={loading} className="w-full bg-[var(--brand-navy)] hover:bg-[var(--brand-navy-deep)]">
