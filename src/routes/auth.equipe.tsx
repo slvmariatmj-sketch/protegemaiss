@@ -20,6 +20,18 @@ function StaffAuth() {
   const [name, setName] = useState("");
   const [role, setRole] = useState<"coordinator" | "teacher" | "director" | "pedagogue">("teacher");
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
+
+  function friendlyError(err: any) {
+    const m: string = err?.message ?? "";
+    if (m.includes("Invalid login credentials")) return "E-mail ou senha incorretos.";
+    if (m.includes("Email not confirmed")) return "Confirme seu e-mail antes de entrar (veja sua caixa de entrada).";
+    if (m.includes("missing email")) return "Informe o e-mail e a senha.";
+    if (m.includes("already registered")) return "Este e-mail já tem conta. Use \"Entrar\".";
+    if (m.includes("fetch") || m.includes("Load failed")) return "Sem conexão com o servidor. Tente novamente em instantes.";
+    return m || "Erro ao autenticar.";
+  }
 
   async function forgotPassword() {
     if (!email) {
@@ -40,8 +52,13 @@ function StaffAuth() {
     }
   }
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // Lê direto do formulário: o preenchimento automático do celular nem sempre atualiza o estado
+    const fd = new FormData(e.currentTarget);
+    const email = String(fd.get("email") ?? emailState).trim().toLowerCase();
+    const password = String(fd.get("password") ?? passwordState);
+    if (!email || !password) { toast.error("Informe o e-mail e a senha."); return; }
     setLoading(true);
     try {
       if (mode === "signup") {
@@ -96,7 +113,7 @@ function StaffAuth() {
         navigate({ to: "/painel" });
       }
     } catch (err: any) {
-      toast.error(err.message ?? "Erro ao autenticar.");
+      toast.error(friendlyError(err));
     } finally {
       setLoading(false);
     }
