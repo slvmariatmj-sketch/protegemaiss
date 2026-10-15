@@ -56,8 +56,8 @@ function StaffAuth() {
     e.preventDefault();
     // Lê direto do formulário: o preenchimento automático do celular nem sempre atualiza o estado
     const fd = new FormData(e.currentTarget);
-    const email = String(fd.get("email") ?? emailState).trim().toLowerCase();
-    const password = String(fd.get("password") ?? passwordState);
+    const email = String(fd.get("email") ?? "").trim().toLowerCase();
+    const password = String(fd.get("password") ?? "");
     if (!email || !password) { toast.error("Informe o e-mail e a senha."); return; }
     setLoading(true);
     try {
