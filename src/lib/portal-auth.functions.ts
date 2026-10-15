@@ -30,13 +30,22 @@ export const portalLogin = createServerFn({ method: "POST" })
     const studentCpf = onlyDigits(student.cpf ?? "");
     const guardianCpf = onlyDigits(student.guardian_cpf ?? "");
 
-    // CPF é opcional: só validamos quando o aluno tem CPF cadastrado E o
-    // usuário informou um. Cadastros simplificados (sem CPF) usam apenas matrícula.
+    // Aluno: CPF opcional — só validamos quando informado.
     if (data.kind === "student" && studentCpf && cpf && studentCpf !== cpf) {
       throw new Error("Matrícula ou CPF inválidos.");
     }
-    if (data.kind === "parent" && guardianCpf && cpf && guardianCpf !== cpf) {
-      throw new Error("Matrícula ou CPF do responsável inválidos.");
+
+    // Responsável: CPF obrigatório. Deve bater com o CPF do responsável
+    // cadastrado; quando o cadastro não tem CPF do responsável, aceitamos o
+    // CPF do próprio aluno como fallback.
+    if (data.kind === "parent") {
+      if (!cpf || cpf.length !== 11) {
+        throw new Error("Informe o CPF do responsável (11 dígitos).");
+      }
+      const expected = guardianCpf || studentCpf;
+      if (expected && expected !== cpf) {
+        throw new Error("Matrícula ou CPF do responsável inválidos.");
+      }
     }
 
     const token = signPortalToken({
