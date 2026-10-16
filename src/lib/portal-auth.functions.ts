@@ -42,9 +42,13 @@ export const portalLogin = createServerFn({ method: "POST" })
       if (!cpf || cpf.length !== 11) {
         throw new Error("Informe o CPF do responsável (11 dígitos).");
       }
-      const expected = guardianCpf || studentCpf;
-      if (expected && expected !== cpf) {
-        throw new Error("Matrícula ou CPF do responsável inválidos.");
+      if (guardianCpf) {
+        if (guardianCpf !== cpf && studentCpf !== cpf) {
+          throw new Error("Esse CPF não corresponde ao responsável cadastrado para esta matrícula.");
+        }
+      } else {
+        // Primeiro acesso: vincula o CPF do responsável à matrícula
+        await supabaseAdmin.from("students").update({ guardian_cpf: cpf }).eq("id", student.id);
       }
     }
 
