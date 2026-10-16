@@ -129,7 +129,7 @@ function StaffAuth() {
           <>
             <div>
               <Label htmlFor="name">Nome completo</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={120} />
+              <Input id="name" name="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={120} />
             </div>
             <div>
               <Label htmlFor="role">Função</Label>
@@ -149,7 +149,7 @@ function StaffAuth() {
         )}
         <div>
           <Label htmlFor="email">E-mail institucional</Label>
-          <Input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <Input id="email" name="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
           <div className="flex items-center justify-between">
@@ -164,7 +164,7 @@ function StaffAuth() {
               </button>
             )}
           </div>
-          <Input id="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+          <Input id="password" name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
         </div>
         <Button type="submit" disabled={loading} className="w-full bg-[var(--brand-navy)] hover:bg-[var(--brand-navy-deep)]">
           {loading ? "Aguarde..." : mode === "login" ? "Entrar" : "Criar conta"}
